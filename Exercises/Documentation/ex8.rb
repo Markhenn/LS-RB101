@@ -1,7 +1,7 @@
 # Use irb to run the following code:
 
 =begin
-  Problem: analyse behauviour Numeric#step method
+  Problem: Find a method that is not in the original class or parent class
   Test case: see below
   Data structure: number
   Algorithm: look up documentation then see below
