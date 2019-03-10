@@ -1,21 +1,20 @@
 # Write a method that takes one argument, an array containing integers, and returns the average of all numbers in the array. The array will never be empty and the numbers will always be positive integers. The tests should print true.
 
-
 =begin
   Problem: get the avg of ints from an array
   input: array of ints
   output: number
   Test case: see below
-  Data structure: 
+  Data structure:
   input: array
   output number
-  Algorithm: 
+  Algorithm:
   loop over array with reduce to sum up
   devide but ary size
   return that
 =end
 
-def average ary
+def average(ary)
   ary.reduce { |sum, n| sum + n } / ary.size.to_f
 end
 
