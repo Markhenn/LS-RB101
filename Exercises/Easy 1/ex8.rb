@@ -1,4 +1,7 @@
-# Write a method that takes one argument, an array containing integers, and returns the average of all numbers in the array. The array will never be empty and the numbers will always be positive integers. The tests should print true.
+# Write a method that takes one argument, an array containing integers,
+# and returns the average of all numbers in the array.
+# The array will never be empty and the numbers will always be positive integers
+# The tests should print true.
 
 =begin
   Problem: get the avg of ints from an array
