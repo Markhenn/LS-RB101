@@ -14,11 +14,10 @@
   return string
 =end
 
-
 def stringy (number, option = 1)
   string = ''
-  number.times {|n| string << ((n + option).odd? ? '1' : '0')}
-  return string
+  number.times { |n| string << (n + option).odd? ? '1' : '0' }
+  string
 end
 
 puts stringy(6) == '101010'

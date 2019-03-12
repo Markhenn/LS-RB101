@@ -1,0 +1,10 @@
+  # Messages for the calculator
+  
+  en: 
+    operator_msg: "Please use, add, subtract, multiply, divide or 1, 2, 3, 4!"
+    number_input_msg: "Please put in a number: "
+  
+  de: 
+    operator_msg: "Bitte verwenden sie, add, subtract, multiply, divide oder 1, 2, 3, 4!"
+    number_input_msg: "Bitte geben sie eine Zahl ein: "
+
