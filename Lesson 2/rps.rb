@@ -8,7 +8,8 @@ def prompt(message)
 end
 
 def determine_winner(user_choice, comp_choice)
-  # There are only 3 combinations in the game that let the user win
+  # There are only 11 combinations in the game that let the user win.
+  # Each element in the array is comination were the user wins.
   user_wins = %w(rs rl rv pr pv sp sl lv lp vr vs)
   play_result = user_choice + comp_choice
 
