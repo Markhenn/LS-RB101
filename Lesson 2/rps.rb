@@ -1,21 +1,21 @@
 # RPS game from Lesson 2 of Launch School RB101
 
-RPS_CHOICES = %w(r p s l v)
-RPS_CHOICES_LONG = %w(Rock Paper Scissors Lizard Spock)
+RPS_CHOICES = {
+  'r' => { longname: 'Rock', beats: ['s', 'l'] },
+  'p' => { longname: 'Paper', beats: ['r', 'v'] },
+  's' => { longname: 'Scissors', beats: ['p', 'l'] },
+  'l' => { longname: 'Lizard', beats: ['v', 'p'] },
+  'v' => { longname: 'Spock', beats: ['r', 's'] }
+}
 
 def prompt(message)
   puts "=> #{message}"
 end
 
-def determine_winner(user_choice, comp_choice)
-  # There are only 11 combinations in the game that let the user win.
-  # Each element in the array is comination were the user wins.
-  user_wins = %w(rs rl rv pr pv sp sl lv lp vr vs)
-  play_result = user_choice + comp_choice
-
+def determine_user_outcome(user_choice, comp_choice)
   if user_choice == comp_choice
     'draw'
-  elsif user_wins.include?(play_result)
+  elsif RPS_CHOICES[user_choice][:beats].include?(comp_choice)
     'won'
   else
     'lost'
@@ -23,8 +23,8 @@ def determine_winner(user_choice, comp_choice)
 end
 
 def display_results(result, user, comp)
-  prompt("Your choice is #{RPS_CHOICES_LONG[RPS_CHOICES.index(user)]}")
-  prompt("The computers choice is #{RPS_CHOICES_LONG[RPS_CHOICES.index(comp)]}")
+  prompt("Your choice is #{RPS_CHOICES[user][:longname]}")
+  prompt("The computers choice is #{RPS_CHOICES[comp][:longname]}")
 
   if result == 'draw'
     prompt('This round is a draw!')
@@ -36,23 +36,26 @@ end
 
 def choose_strategy
   loop do
-    prompt('Please choose a strategy:')
-    RPS_CHOICES.each_index do |i|
-      prompt("#{i + 1}. #{RPS_CHOICES[i]} = #{RPS_CHOICES_LONG[i]}")
+    prompt('Please choose one of the following moves:')
+    RPS_CHOICES.each do |k, v|
+      prompt("#{k} = #{v[:longname]}")
     end
 
-    user_choice = gets.chomp[0].downcase
-    return user_choice if RPS_CHOICES.include?(user_choice)
+    user_choice = gets.chomp[0]
+    if !user_choice.nil? && RPS_CHOICES.include?(user_choice.downcase)
+      return user_choice.downcase
+    end
 
     prompt('Invalid strategy!')
   end
 end
 
 def play_a_round
-  comp_choice = RPS_CHOICES.sample
+  comp_choice = RPS_CHOICES.keys.sample
   user_choice = choose_strategy
+  system('clear') || system('cls')
 
-  result = determine_winner(user_choice, comp_choice)
+  result = determine_user_outcome(user_choice, comp_choice)
   display_results(result, user_choice, comp_choice)
 
   result
