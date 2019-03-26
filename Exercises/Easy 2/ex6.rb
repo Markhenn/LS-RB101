@@ -1,28 +1,21 @@
-# Write a method that takes one argument, a string containing one or more words, and returns the given string with all five or more letter words reversed. Each string will consist of only letters and spaces. Spaces should be included only when more than one word is present.
+# Print all odd numbers from 1 to 99, inclusive. All numbers should be printed on separate lines.
 
 =begin
-  Problem: Only reverse words that are => 5 in size
-  input: string of words
-  output: string of words with some reversed
-  Test case: see below
-  Data structure: 
-  input: string
-  change to array
-  output: string
-  Algorithm: 
-  split string into array
-  loop over array
-    reverse words that are => 5
-  join array to string
+Problem: print only odd numbers
+input: range
+output: print
+Examples Test cases:
+all odd numbers from 1 to 99 printed
+Algorithm
+Create range
+each item
+  if odd puts item
 =end
 
-def reverse_words string
-  reverse_size_5 = Proc.new {|element| element.size >= 5 ? element.reverse : element }
-  string.split.map(&reverse_size_5).join(" ")
+(1..99).step(2) {|n| puts n}
+
+number = 1
+while number <= 99
+  puts number if number.odd?
+  number += 1
 end
-
-puts reverse_words('Professional')          # => lanoisseforP
-puts reverse_words('Walk around the block') # => Walk dnuora the kcolb
-puts reverse_words('Launch School')         # => hcnuaL loohcS
-
-  

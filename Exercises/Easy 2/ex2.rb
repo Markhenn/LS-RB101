@@ -1,41 +1,51 @@
-# Write a method that takes one integer argument, which may be positive, negative, or zero. This method returns true if the number's absolute value is odd. You may assume that the argument is a valid integer value. Keep in mind that you're not allowed to use #odd? or #even? in your solution.
+# Calculate room size
 
 =begin
-  Problem: Write a method that returns true if the absolut input is odd, or false if even
-  input: int -> positive, negative, or zero
-  output: true or false
+  Problem: calculate the the room size in square m and feet
+  input: float, float
+  output: float
   Test case: see below
-  Data structure: 
-  input: integer
-  output: boolean
-  Algorithm: 
-  if abs number is odd -> return true
-    how to check for odd -> number % 2 == 1
-  else -> return false
+  Data structure:
+  input: float, float
+  output: float
+  Algorithm:
+  GET length from user
+  GET width from user
+  calculate square meter
+  calculate square feet
+  show to user
 =end
 
-def is_odd? number
-  number % 2 == 1
+SQMETERS_TO_SQFEET = 10.7639
+
+def calculate_room_sqm(length, width)
+  (length * width).round(2)
 end
 
-puts is_odd?(2)    # => false
-puts is_odd?(5)    # => true
-puts is_odd?(-17)  # => true
-puts is_odd?(-8)   # => false
-puts is_odd?(0)    # => false
-puts is_odd?(7)    # => true
+def translate_to_sqf(sqm)
+  (sqm * SQMETERS_TO_SQFEET).round(2)
+end
+
+def start_program
+  puts '==> Please enter the width of the room in meters'
+  width = gets.chomp.to_f
+  puts '==> Please enter the length of the room in meters'
+  length = gets.chomp.to_f
+
+  sqm = calculate_room_sqm(width, length)
+  sqf = translate_to_sqf(sqm)
+
+  puts "The area of the room is #{sqm} square meters (#{sqf} square feet)."
+end
+
+start_program
+
 
 =begin
-  
-exploration:
-def is_odd? number
-  number.abs % 2 == 1
-end
-
-the above makes sure, that we use the absolute of the integer to make sure it works when unsure about modulus or remainder
-
-def is_odd? number
-  number.abs.remainder(2) == 1
-end
-  
+puts calculate_room_sqm(5, 10) == 50
+puts calculate_room_sqm(0, 10) == 0
+puts calculate_room_sqm(5, 0) == 0
+puts translate_to_sqf(1) == 10.7639
+puts translate_to_sqf(0) == 0
+puts translate_to_sqf(10) == 107.639
 =end

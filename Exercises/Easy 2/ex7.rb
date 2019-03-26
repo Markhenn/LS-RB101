@@ -1,37 +1,23 @@
-# Write a method that takes one argument, a positive integer, and returns a string of alternating 1s and 0s, always starting with 1. The length of the string should match the given integer. The tests should print true.
+# Print all even numbers from 1 to 99, inclusive. All numbers should be printed on separate lines.
 
 =begin
-  Problem: creating a string of alternating 1 and 0. length of string comes from a given int
-  input: integer
-  output: string with 1010...
-  Test case: see below
-  Data structure: 
-  input: int
-  output: string
-  Algorithm: 
-  create a loop that runs int times
-    take modulo 2 of looping number and add that to string
-  return string
+Problem: print only even numbers
+input: range
+output: print
+Examples Test cases:
+all odd numbers from 1 to 99 printed
+Algorithm
+Create range
+each item
+  if odd puts item
 =end
 
-def stringy (number, option = 1)
-  string = ''
-  number.times { |n| string << (n + option).odd? ? '1' : '0' }
-  string
+(2..99).step(2) { |n| puts n }
+
+number = 1
+while number <= 99
+  puts number if number.even?
+  number += 1
 end
 
-puts stringy(6) == '101010'
-puts stringy(9) == '101010101'
-puts stringy(4) == '1010'
-puts stringy(7) == '1010101'
-
-
-
-=begin
-alternative
-def stringy number
-  string = ''
-  number.times {|n| string << ((n + 1) % 2).to_s}
-  return string
-end
-=end
+99.times { |n| puts n if n.even? }

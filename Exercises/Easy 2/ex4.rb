@@ -1,60 +1,50 @@
-# Write a method that counts the number of occurrences of each element in a given array.
-
-# The words in the array are case-sensitive: 'suv' != 'SUV'. ` Once counted, print each element alongside the number of occurrences.
+# Retirement calculator
 
 =begin
-  Problem: 
-  input: array with repeating elements
-  output: list in console with how many times each element has been found
-  important case sensitive
-  Test case: see below
-  Data structure: array, hash, number, 
-  Algorithm: 
-  loop over array
-    add element as key to hash with value +1
-  loop over hash to print key value pairs
+Problem: Calculate the retirement date out of user input and current year
+input: int, int
+out: print to screen, int
+Examples / Test Cases:
+puts calculate_retirement_year(0, 65) == YEAR + 65
+puts calculate_retirement_year(0, 0) == false
+puts calculate_retirement_year(0, -2) == false
+Data Structure:
+input: int, int
+output: print, int
+Algorithm:
+GET age from user
+GET retirement date from user
+GET current year from time
+if Compare Retirement - AGE > 0
+  return year + Retirment - Age 
+else
+  return false
+print result to screen
 =end
 
-=begin
-def count_occurrences list
-  list_hash = Hash.new(0)
-  list.each do |item|
-    list_hash[item.downcase] += 1
-  end
+YEAR = Time.now.year
 
-  list_hash.each {|k,v| puts "#{k} => #{v}"}
-
+def calculate_retirement_year(age, retirement)
+  retirement - age + YEAR
 end
-=end
 
-vehicles = [
-  'car', 'car', 'truck', 'car', 'SUV', 'truck',
-  'motorcycle', 'motorcycle', 'car', 'truck', 'suv', 'truck'
-]
-
-
-
-=begin
-car => 4
-truck => 3
-SUV => 1
-motorcycle => 2
-=end
-
-
-
-# LS Solution:
-def count_occurrences(array)
-  occurrences = {}
-
-  array.map(&:downcase).each do |element|
-    occurrences[element] = array.count(element)
-  end
-
-  occurrences.each do |element, count|
-    puts "#{element} => #{count}"
-  end
+def calulate_time_to_retirement(age, retirement)
+  retirement - age
 end
 
 
-count_occurrences(vehicles)
+def start_program
+  print 'What is your age? '
+  age = gets.chomp.to_i
+  print 'At what age would you like to retire? '
+  retirement_age = gets.chomp.to_i
+
+  retirement_year = calculate_retirement_year(age, retirement_age)
+  retirement = calulate_time_to_retirement(age, retirement_age)
+
+  puts "It's #{YEAR}. You will retire in #{retirement_year}."
+  puts "You have only #{retirement} years of work to go!"
+end
+
+start_program
+

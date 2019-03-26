@@ -1,33 +1,41 @@
-# Write a method that takes one argument, a positive integer, and returns a list of the digits in the number.
+# Tip Calculator
 
 =begin
-  Problem: Split an integer into each single digit and store it into an array
-  input: int
-  output: array of single digits
-  
+  Problem: Take a bill amount and a tip percent and display the total and the tip
+  input: float, float
+  output: float, float, console print
   Test case: see below
-  Data structure: int, array string, string
-  input: int number
-  turn into string
-  output: array 
-  Algorithm: 
-  turn number into string
-  split each digit in the string and store in a array
-  loop over array and turn string to int
-  
+  Data structure:
+  input: float, float
+  output: float, float
+  Algorithm:
+  GET Bill amount from user
+  GET TIP percent from user
+  Calculate Tip
+  PRINT results
 =end
 
-def digit_list number
-  string_array = number.to_s.split("")
-  string_array.map {|n| n.to_i}
+def calc_tip(amount, tip)
+  (amount * tip / 100).round(2)
 end
 
-puts digit_list(12345) == [1, 2, 3, 4, 5]     # => true
-puts digit_list(7) == [7]                     # => true
-puts digit_list(375290) == [3, 7, 5, 2, 9, 0] # => true
-puts digit_list(444) == [4, 4, 4]             # => true
+def start_program
+  print '==> What is the bill: '
+  bill = gets.chomp.to_f
+  print '==> What is the tip in percent: '
+  tip_percent = gets.chomp.to_f
 
-# Solution: 
-# def digit_list(number)
-#  number.to_s.chars.map(&:to_i)
-#end
+  tip_total = calc_tip(bill, tip_percent)
+
+  puts "The tip is $#{format("%2.2f", tip_total)}"
+  puts "The total bill is $#{format("%02.2f", tip_total + bill)}"
+end
+
+start_program
+
+=begin
+puts calc_tip(0, 1) == 0
+puts calc_tip(1, 0) == 0
+puts calc_tip(1, 1) == 0.01
+puts calc_tip(10, 10) == 1
+=end
