@@ -1,25 +1,109 @@
-MAXIMUM_LENGTH = 76
+# Bannerizer
 
-def print_multiple_lines(str)
-  line = ''
-  lines = []
-  str.split.each do |word|
-    if line.size + word.size > MAXIMUM_LENGTH
-      line.strip
-      lines << line
-      line = ''
+=begin
+Problem:
+input: a short line of text,
+output: print it within a box.
+
+x = size of text
+when x == 0
+  puts +--+
+  puts |  |
+  puts |  |
+  puts |  |
+  puts +--+
+
+when x > 0
+  puts +-"-"*size-+
+  puts | ""*size |
+  puts | "text" |
+  puts | ""*size |
+  puts +-"-"*size-+
+
+extra:
+make the message fit in 80 columns
+make a longer than 80 message wordwrap
+
+split text in array of words
+SET new text
+index = 0
+loop over text_ary until empty
+    if new_text.size + text_ary[0].size + ' '  is less than max length
+      new_text << text_ary.shift + ' '
+    else
+      puts "| new_text + " "*(new_text.size-max_length)|"
     end
-    line += (word + ' ')
   end
-  line.strip
-  lines << line
-  max_length = lines.map(&:size).max
-  puts "+#{'-' * (max_length + 2)}+"
-  puts "|#{' ' * (max_length + 2)}|"
-  lines.each {|text| puts "| #{text}#{' ' * (max_length - text.size)} |"}
-  puts "|#{' ' * (max_length + 2)}|"
-  puts "+#{'-' * (max_length + 2)}+"
+  
+
+test cases:
+see below
+
+data structure:
+input: string
+output: print
+
+algorithm:
+GET text_length = text.size
+puts "+-#{- * text_length}-+"
+puts next line with empty
+puts text line
+puts next line with empty
+puts last line like top
+=end
+
+MAX_LENGTH = 76
+
+def print_in_box1(text)
+  text_length = text.size
+  if text_length > MAX_LENGTH
+    text = text.slice(0..MAX_LENGTH - 1)
+    text_length = MAX_LENGTH
+  end
+
+  box_line = "+-#{'-' * text_length}-+"
+  empty_line = "| #{' ' * text_length} |"
+  text_line = "| #{text} |"
+  puts box_line
+  puts empty_line
+  puts text_line
+  puts empty_line
+  puts box_line
 end
 
+def print_with_wrap(text)
+text_ary = text.split
+new_text_ary = []
+new_text = ''
+  loop do
+    break if text_ary.empty? && new_text.empty?
+    
+    if new_text.size + text_ary.size + 1 > MAX_LENGTH || text_ary.empty?
+      new_text_ary << new_text
+      new_text = ''
+    else
+      new_text << text_ary.shift + ' '
+    end
+  end
 
-print_multiple_lines("In forty years, Earth's population will reach ten billion. Can our world support that? What kind of world will it be? Those answering these questions generally fall into two deeply divided groups--Wizards and Prophets, as Charles Mann calls them in this balanced, authoritative, nonpolemical new book. The Prophets, he explains, follow William Vogt, a founding environmentalist who believed that in using more than our planet has to give, our prosperity will lead us to ruin. Cut back! was his mantra. Otherwise everyone will lose! The Wizards are the heirs of Norman Borlaug, whose research, in effect, wrangled the world in service to our species to produce modern high-yield crops that then saved millions from starvation. Innovate! was Borlaug's cry. Only in that way can everyone win! Mann delves into these diverging viewpoints to assess the four great challenges humanity faces--food, water, energy, climate change--grounding each in historical context and weighing the options for the future. With our civilization on the line, the author's insightful analysis is an essential addition to the urgent conversation about how our children will fare on an increasingly crowded Earth.")
+  new_text_ary.each do |texts|
+    puts "| #{texts + ' ' * (MAX_LENGTH + 1 - texts.size)}|"
+  end
+end
+
+def print_in_box(text)
+  text_length = text.size
+  text_length = MAX_LENGTH if text_length > MAX_LENGTH
+
+  box_line = "+-#{'-' * text_length}-+"
+  empty_line = "| #{' ' * text_length} |"
+  puts box_line
+  puts empty_line
+  print_with_wrap(text)
+  puts empty_line
+  puts box_line
+end
+
+print_in_box('To boldly go where no one has gone before.')
+print_in_box('To boldly go where no one has gone before and this message is way to long for a terminal window to print without wrapping. Which means the text has to wrap around a few times.')
+print_in_box('')
