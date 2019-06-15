@@ -47,7 +47,7 @@ end
 def player_places_piece!(brd)
   square = ''
   loop do
-    prompt "Choose a square (#{empty_squares?(brd).join(', ')}):"
+    prompt "Choose a square (#{joinor(empty_squares?(brd))}):"
     square = gets.chomp.to_i
     break if empty_squares?(brd).include?(square)
 
@@ -56,8 +56,21 @@ def player_places_piece!(brd)
   brd[square] = PLAYER_MARKER
 end
 
+def find_at_risk_square(line, board)
+  if board.values_at(*line).count(PLAYER_MARKER) == 2
+    board.select { |k, v| line.include?(k) && v == INITIAL_MARKER }.keys.first
+  end
+end
+
 def computer_places_piece!(brd)
-  square = empty_squares?(brd).sample
+  square = nil
+  WINNING_LINES.each do |line|
+    square = find_at_risk_square(line, brd)
+    break if square
+  end
+
+  square = empty_squares?(brd).sample if !square
+
   brd[square] = COMPUTER_MARKER
 end
 
@@ -80,6 +93,22 @@ def detect_winner(brd)
   nil
 end
 
+def joinor(ary, delimiter=', ', word='or')
+  if ary.size <= 2
+    return ary.join(" #{word} ")
+  end
+
+  ary.map(&:to_s).reduce do |string, element|
+    string << if element == ary.last.to_s
+                "#{delimiter}#{word} #{element}"
+              else
+                "#{delimiter}#{element}"
+              end
+  end
+end
+
+winners = []
+
 loop do
   board = initialize_board
 
@@ -98,6 +127,13 @@ loop do
     prompt "#{detect_winner(board)} won!"
   else
     prompt "It's a tie!"
+  end
+
+  winners << detect_winner(board)
+
+  if winners.count('Player') == 5 || winners.count('Computer') == 5
+    prompt "#{detect_winner(board)} won 5 games! The game is over"
+    break
   end
 
   prompt "If you want to play again type y!"
