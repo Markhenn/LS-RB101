@@ -73,3 +73,29 @@ call each on winning lines
     if a line contains 2 player markers
         set that line for square
 return square
+
+# Computer AI: Offense
+## Problem
+Make the computer win the game if possible
+Piggyback on the find_at risk_method
+
+## Test Cases
+``` Ruby
+
+def find_at_risk_square(line, board)
+  if board.values_at(*line).count(PLAYER_MARKER) == 2
+    board.select { |k, v| line.include?(k) && v == INITIAL_MARKER }.keys.first
+  end
+end
+
+board = {}
+(1..9).each { |num| board[num] = ' ' }
+board[1] = 'X'
+board[2] = 'X'
+board[4] = 'O'
+board[5] = 'O'
+
+find_at_risk_square([4, 5, 6], board)
+p board == {1=>"X", 2=>"X", 3=>" ", 4=>"O", 5=>"O", 6=>"O", 7=>" ", 8=>" ", 9=>" "}
+
+```

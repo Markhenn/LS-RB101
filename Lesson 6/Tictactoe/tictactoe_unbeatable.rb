@@ -1,4 +1,7 @@
-# tic tac toe with unbeatable AI
+# TicTacToe Game with unbeatable AI
+
+require 'pry'
+require 'pry-byebug'
 
 INITIAL_MARKER = ' '
 PLAYER_MARKER = 'X'
@@ -13,23 +16,25 @@ def prompt(msg)
   puts "=> #{msg}"
 end
 
-def display_squares(brd, sql, sqm, sqr)
-  puts "     |     |"
-  puts "  #{brd[sql]}  |  #{brd[sqm]}  |  #{brd[sqr]}"
-  puts "     |     |"
-end
-
+# rubocop:disable Metrics/MethodLength, Metrics/AbcSize
 def display_board(brd)
   system 'clear'
   puts "You're a #{PLAYER_MARKER}. Computer is a #{COMPUTER_MARKER}"
   puts ""
-  display_squares(brd, 1, 2, 3)
+  puts "     |     |"
+  puts "  #{brd[1]}  |  #{brd[2]}  |  #{brd[3]}"
+  puts "     |     |"
   puts "-----+-----+-----"
-  display_squares(brd, 4, 5, 6)
+  puts "     |     |"
+  puts "  #{brd[4]}  |  #{brd[5]}  |  #{brd[6]}"
+  puts "     |     |"
   puts "-----+-----+-----"
-  display_squares(brd, 7, 8, 9)
+  puts "     |     |"
+  puts "  #{brd[7]}  |  #{brd[8]}  |  #{brd[9]}"
+  puts "     |     |"
   puts ""
 end
+# rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 
 def initialize_board
   new_board = {}
@@ -75,43 +80,37 @@ def computer_places_piece_old!(brd)
   brd[square] = COMPUTER_MARKER
 end
 
-def deep_copy(brd)
-  brd.each_with_object({}) { |(k, v), hsh| hsh[k] = v }
-end
-
 def computer_places_piece!(brd)
   brd_values = empty_squares?(brd).each_with_object({}) do |square, hash|
-    new_brd = deep_copy(brd)
-    new_brd[square] = COMPUTER_MARKER
-    hash[square] = minimax(new_brd, 0, false)
+    hash[square] = minimax(brd, false)
   end
 
+  binding.pry
   optimal_square = brd_values.max_by { |_k, v| v }
   brd[optimal_square.first] = COMPUTER_MARKER
 end
 
 # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
-def minimax(brd, depth, computer)
-  if empty_squares?(brd).empty? || someone_won?(brd)
-    return game_result(brd)
+def minimax(brd, computer)
+  new_brd = brd.each_with_object({}) { |(k, v), hsh| hsh[k] = v }
+  if empty_squares?(new_brd).empty? || someone_won?(new_brd)
+    return game_result(new_brd)
   end
 
   if computer
     values = []
-    empty_squares?(brd).each do |space|
-      new_brd = deep_copy(brd)
-      new_brd[space] = COMPUTER_MARKER
-      values << minimax(new_brd, depth + 1, false)
+    empty_squares?(new_brd).each do |space|
+      new_brd[space] = 'O'
+      values << minimax(new_brd, false)
     end
-    values.max
+    return values.max
   else
     values = []
-    empty_squares?(brd).each do |space|
-      new_brd = deep_copy(brd)
-      new_brd[space] = PLAYER_MARKER
-      values << minimax(new_brd, depth + 1, true)
+    empty_squares?(new_brd).each do |space|
+      new_brd[space] = 'X'
+      values << minimax(new_brd, true)
     end
-    values.min
+    return values.min
   end
 end
 # rubocop:enable Metrics/MethodLength, Metrics/AbcSize

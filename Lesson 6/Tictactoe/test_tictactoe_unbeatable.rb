@@ -1,4 +1,9 @@
-# tic tac toe with unbeatable AI
+# Test for unbeatable
+
+# TicTacToe Game with unbeatable AI
+
+require 'pry'
+require 'pry-byebug'
 
 INITIAL_MARKER = ' '
 PLAYER_MARKER = 'X'
