@@ -80,43 +80,52 @@ def deep_copy(brd)
 end
 
 def computer_places_piece!(brd)
-  brd_values = empty_squares?(brd).each_with_object({}) do |square, hash|
-    new_brd = deep_copy(brd)
-    new_brd[square] = COMPUTER_MARKER
-    hash[square] = minimax(new_brd, 0, false)
-  end
-
-  optimal_square = brd_values.max_by { |_k, v| v }
-  brd[optimal_square.first] = COMPUTER_MARKER
+  optimal_square = minimax(brd, 0, true)
+  brd[optimal_square] = COMPUTER_MARKER
 end
 
-# rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+def optimal_square(brd_values)
+  max_value = brd_values.values.max
+  top_squares = brd_values.each_with_object([]) do |(k, v), ary|
+    ary << k if v == max_value
+  end
+  top_squares.sample
+end
+
+def node_result(brd_values, computer)
+  if computer
+    brd_values.values.max
+  else
+    brd_values.values.min
+  end
+end
+
+# rubocop:disable Metrics/MethodLength
 def minimax(brd, depth, computer)
   if empty_squares?(brd).empty? || someone_won?(brd)
-    return game_result(brd)
+    return terminal_result(brd)
   end
 
-  if computer
-    values = []
-    empty_squares?(brd).each do |space|
-      new_brd = deep_copy(brd)
+  minmax_values = empty_squares?(brd).each_with_object({}) do |space, hash|
+    new_brd = deep_copy(brd)
+    if computer
       new_brd[space] = COMPUTER_MARKER
-      values << minimax(new_brd, depth + 1, false)
-    end
-    values.max
-  else
-    values = []
-    empty_squares?(brd).each do |space|
-      new_brd = deep_copy(brd)
+      hash[space] = minimax(new_brd, depth + 1, false)
+    else
       new_brd[space] = PLAYER_MARKER
-      values << minimax(new_brd, depth + 1, true)
+      hash[space] = minimax(new_brd, depth + 1, true)
     end
-    values.min
   end
-end
-# rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 
-def game_result(brd)
+  if depth == 0
+    return optimal_square(minmax_values)
+  end
+
+  node_result(minmax_values, computer)
+end
+# rubocop:enable Metrics/MethodLength,
+
+def terminal_result(brd)
   if detect_winner(brd) == 'Computer'
     1
   elsif detect_winner(brd) == 'Player'
