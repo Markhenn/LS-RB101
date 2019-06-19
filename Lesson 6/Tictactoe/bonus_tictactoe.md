@@ -1,101 +1,188 @@
 Bonus Features for TicTacToe Game
 
-# Improved "join"
+# Starting Player
+The `FIRST` constant can be set to 'player', 'computer' or 'choose'.
+When 'choose' the player can choose who goes first
 
-## Problem
-- Improve the prompt for possible choices to position a piece for the player
-- the last item should join with an or instead of just a comma
-- Write a method called joinor
+# Unbeatable AI
+The AI uses a minimax algorith to decide which square to play
+From the optimal squares it randomly picks one
 
-Input:
-- an array
-- optional string sign between the joining elements
-- optional word for last joined elements
+#TODO
+## bigger play area
+### Problem: Size of board
+let the player decide on different board_sizes for the game
+input: nothing
+output: the size of the board in squares as an int
 
-Output:
-- a string of the joined elements
+When the constant is set to 'choose' 
+    the player will be asked to choose a size of
+        3x3
+        5x5
+        9x9?
+otherwise the number in the constant will be used as the number of squares
 
-## Test Cases
-``` Ruby
-joinor([1, 2])                   # => "1 or 2"
-joinor([1, 2, 3])                # => "1, 2, or 3"
-joinor([1, 2, 3], '; ')          # => "1; 2; or 3"
-joinor([1, 2, 3], ', ', 'and')   # => "1, 2, and 3"
+### Data Structure / Algorithm
+def board_size
+brd_size = if constant is set to 'choose'
+            loop
+            put text about options to choose
+                options are, 3, 5, 9 
+            get the answer
+            check if 3,5,9
+            return answer.to_i ** 2
+           else
+            return constant
+
+
+### Problem: Winning Lines
+Redefine WINNING LINES as a function that gets called
+input: the board
+output: a nested array with the winning lines inside
+
+```ruby
+WINNING_LINES = [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # columns
+                [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
+                [[1, 5, 9], [3, 5, 7]]              # diagonals
 ```
 
-## Data Structure / Algorithm
-1. if array length is <= 2
-    - return join array on ', '
-2. call reduce on array 
-3.  if element is last element in array
-    - append join sign, space, word, space, element
-4.  else
-    - append sign, space, element
-
-
-# Keep Score
-## Problem
-Keep track of scores
-first to 5 wins
-no no global variables or constants
-
-## Data Structure / Algorithm
-create a winners array outside all loops
-add the winner to the array (or tie) every round
-break the outer loop if someone has won 5 times 
-display a message for the total winner
-
-# Computer AI: Defense
-## Problem
-Create a computer that counters when the player has 2 squares in a row
-if no threat pick random square
-
-modify computer_places_piece! method
-input: the board (hash keys are numbers and values are the markers)
-output: nothing -> but modifies the board in a key to become the computer marker
-
-## Test Cases
-``` Ruby
-board = {}
-(1..9).each { |num| board[num] = ' ' }
-board[1] = 'X'
-board[2] = 'X'
-board[4] = 'O'
-
-pick_defense!(board)
-board == {1=>"X", 2=>"X", 3=>"O", 4=>"O", 5=>" ", 6=>" ", 7=>" ", 8=>" ", 9=>" "}
-```
-
-## Data Structure / Algorithm
-set square randomly
-Use the winning lines to determine where to set the last piece
-call each on winning lines
-    if a line contains 2 player markers
-        set that line for square
-return square
-
-# Computer AI: Offense
-## Problem
-Make the computer win the game if possible
-Piggyback on the find_at risk_method
-
-## Test Cases
-``` Ruby
-
-def find_at_risk_square(line, board)
-  if board.values_at(*line).count(PLAYER_MARKER) == 2
-    board.select { |k, v| line.include?(k) && v == INITIAL_MARKER }.keys.first
-  end
+The winning lines have dimension size columns and rows and 2 diagonals
+The rows could be defined as
+```ruby
+dimension = (brd.size**0.5).to_i
+winning_lines = []
+1.step(brd.size, dimension) do |i| # Rows
+  winning_lines << [index, index + 1, index + 2]
 end
 
-board = {}
-(1..9).each { |num| board[num] = ' ' }
-board[1] = 'X'
-board[2] = 'X'
-board[4] = 'O'
-board[5] = 'O'
+1.upto(dimension) do |i| # Columns
+  winning_lines << [index, index + dimension, index + dimension]
+end
 
-find_at_risk_square([4, 5, 6], board)
-p board == {1=>"X", 2=>"X", 3=>" ", 4=>"O", 5=>"O", 6=>"O", 7=>" ", 8=>" ", 9=>" "}
+winning_lines << [1, brd.size / 2 + 1, brd.size] # Diagonal 1
+winning_lines << [dimension, brd.size / 2 + 1, brd.size - dimension + 1] # Diagonal 2
 
 ```
+
+### Problem: adjust board size
+Redefine display board to accomodate bigger boards
+input: brd
+output: display of board
+
+```ruby
+def display_squares(brd, sql, sqm, sqr)
+  puts "     |     |"
+  puts "  #{brd[sql]}  |  #{brd[sqm]}  |  #{brd[sqr]}"
+  puts "     |     |"
+end
+
+def display_board(brd)
+  system 'clear'
+  puts "You're a #{PLAYER_MARKER}. Computer is a #{COMPUTER_MARKER}"
+  puts ""
+  display_squares(brd, 1, 2, 3)
+  puts "-----+-----+-----"
+  display_squares(brd, 4, 5, 6)
+  puts "-----+-----+-----"
+  display_squares(brd, 7, 8, 9)
+  puts ""
+end
+```
+
+- create a loop to built the board
+- things that are variable with the board
+    the columns  but not the width
+    the rows but not the height
+    where to put the square number
+
+### Data Structure / Algorithm
+the new display board
+
+set dimension to the square root of the size of the board -> to determine size of board
+set brd_values to brd.values -> just the values in an array
+set brd_ary -> this will be a nested array with the size of dimension
+do dimension times
+    brd_array << brd_values.shift
+
+  system 'clear'
+  puts "You're a #{PLAYER_MARKER}. Computer is a #{COMPUTER_MARKER}"
+  puts ""
+brd_array.each_with_index do -> here we call the display of each square until the board is built
+    display_squares(dimension, sub_ary, index)
+
+  puts ""
+
+the new display_squares(dimension, array, index)
+    display_empty_space(dimension)
+    array.each_with_index do |square, index|
+         if index == dimension - 1
+            print "  #{square}\n" 
+        else 
+            print "  #{square}  |"
+    display_empty_space(dimension)
+    display_divider(dimension, index)
+
+
+def display_empty_space(dimension)
+    dimension times |count|
+        if count == dimension
+            print "\n" 
+        else 
+            print "     |"
+    end
+
+def display_divider(dimension, index)
+        if index < dimension - 1 
+        dimension times |count|
+            if count == dimension
+                print "-----\n" 
+            else 
+                print "-----+"
+        end
+
+
+### Problem Improve the AI to work with bigger boards
+with 3x3 the compute time for the ai is noticable on the first move. With 5x5 the the game stop on the first try. 
+Change the ai to the simple mode for the first moves until x fields are empty than switch to minimax
+
+What to change?
+  The old ai to work with different boards
+  The computer picks square methods to make the switch between both boards
+
+#### Redesign computer_picks_square
+  Problem: 
+  needs to make a switch based on empty spaces on the board
+  Create a constant for the switch
+  When the empty space are smaller than this switching number, the minimax algorithm will be called
+  before, the simple version is called
+
+#### Redesign simple square picker
+  Update to accomodate bigger boards
+    update winning lines to method call
+    the middle point needs to be a method call based on board size
+    return the square instead of changing it
+
+#### Update find squares at risk
+  In a 3x3 game the computer should act when there are 2 squares set by the player towards a winning line
+  But in a bigger game it might useful to block earlier
+  This could be optimized by an algorithm, but I would keep it simple because I dont want the computer to break down. 
+
+
+
+
+
+## improve flow through game
+- intro text - done
+- let player choose game end -> refactor loop for asking to play again done
+- show score at the end done
+- let player choose the size done
+- create a random square picker for boards that are too big
+-   no optimizing until a certain smallness, before that the oldschool ai
+-   smallness of less than 9 to start
+- toward the end change to optimal square picking
+
+- create a method that builts the winning lines -> put each one, row, column and diagonals in a separate method
+  row: just create an array with the size and chop it into pieces defined by the width
+  column: map the rows -> first of every subary in an array then the seconds...
+  column: think about how to do that programmaticcaly :) 
+- let player choose rounds as ending
