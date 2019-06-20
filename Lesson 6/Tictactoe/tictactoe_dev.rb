@@ -4,10 +4,11 @@ require 'pry'
 require 'pry-byebug'
 
 INITIAL_MARKER = ' '
-PLAYER_MARKER = 'X'
-COMPUTER_MARKER = 'O'
-STARTING_PLAYER = 'player'
+PLAYER_MARKER = "X"
+COMPUTER_MARKER = "O"
+STARTING_PLAYER = 'choose'
 BOARD_SIZE = 'choose'
+ROUNDS_TO_PLAY = 'choose'
 EMPTY_SQUARES_FOR_AI = 10
 
 def prompt(msg)
@@ -72,11 +73,12 @@ def display_divider(brd_width, row_idx)
   end
 end
 
-def display_squares(brd_width, array, row_idx)
+def display_squares(brd_width, array, row_idx, sqr_numbers)
+  line_numbers = sqr_numbers.shift(brd_width).join(", ")
   display_empty_space(brd_width)
   array.each_with_index do |square, idx|
     if idx == brd_width - 1
-      print "  #{square}"
+      print "  #{square}   \##{line_numbers}"
     else
       print "  #{square}  |"
     end
@@ -89,23 +91,30 @@ end
 def display_board(brd)
   brd_width = calculate_width(brd)
   brd_values = brd.values
+  sqr_numbers = brd.keys
   brd_array = []
+
   1.upto(brd_width) { brd_array << brd_values.shift(brd_width) }
   system 'clear'
   puts "You're a #{PLAYER_MARKER}. Computer is a #{COMPUTER_MARKER}"
   puts ""
   brd_array.each_with_index do |sub_ary, index|
-    display_squares(brd_width, sub_ary, index)
+    display_squares(brd_width, sub_ary, index, sqr_numbers)
   end
 end
 
 def set_board_size
   if BOARD_SIZE == 'choose'
     loop do
-      prompt "Choose board size: type '3' for 3x3 or '5' for 5x5"
+      prompt "You can play tic tac toe on different board sizes from 3x3 to 7x7"
+      prompt "Type 3 for 3x3 (standard tictactoe board size)"
+      prompt "Type 4 for 4x4"
+      prompt "Type 5 for 5x5"
+      prompt "Type 6 for 6x6"
+      prompt "Type 7 for 7x7"
       answer = gets.chomp.to_i
-      break answer**2 if [3, 5].include?(answer)
-      prompt 'Not a valid choice, please use 3 or 5!'
+      break answer**2 if (3..7).cover?(answer)
+      prompt 'Not a valid choice, please type a number from 3 to 7!'
     end
   else
     BOARD_SIZE
@@ -116,6 +125,22 @@ def initialize_board(brd_size)
   new_board = {}
   (1..brd_size).each { |num| new_board[num] = INITIAL_MARKER }
   new_board
+end
+
+def determine_rounds
+  if ROUNDS_TO_PLAY == 'choose'
+    loop do
+      puts ""
+      prompt "How many rounds would you like to play?"
+      prompt "Choose between 1 and 99 rounds"
+      prompt "Type 1 for 1 round, 2 for 2 rounds..."
+      answer = gets.chomp.to_i
+      break answer if (1..99).cover?(answer)
+      prompt "Not a valid choice, type a number between 1 and 99!"
+    end
+  else
+    ROUNDS_TO_PLAY
+  end
 end
 
 def empty_squares?(brd)
@@ -270,11 +295,12 @@ end
 def choose_starting_player
   if STARTING_PLAYER == 'choose'
     loop do
-      prompt 'Who shall go first? Type player or computer?'
+      puts ""
+      prompt 'Who shall go first? Type p for player or c for computer?'
       answer = gets.chomp
-      return answer if ['player', 'computer'].include?(answer)
+      return answer if answer.downcase.start_with?('p', 'c')
 
-      prompt 'Not a valid choice!'
+      prompt 'Not a valid choice, type p or c!'
     end
   else
     STARTING_PLAYER
@@ -282,7 +308,7 @@ def choose_starting_player
 end
 
 def place_piece!(brd, player)
-  if player == 'player'
+  if player == 'p'
     player_places_piece!(brd)
   else
     computer_places_piece!(brd)
@@ -290,13 +316,15 @@ def place_piece!(brd, player)
 end
 
 def alternate_player(current_player)
-  current_player == 'player' ? 'computer' : 'player'
+  current_player == 'p' ? 'c' : 'p'
 end
 
 def display_game_stats(rounds, winners)
+  current_round = rounds[:current_round]
+  final_round = rounds[:last_round]
   puts ''
   prompt "Last round was won by: #{winners.last || 'No one'}"
-  prompt "Rounds played: #{rounds}"
+  prompt "#{current_round} rounds out of #{final_round} played"
   prompt "Rounds won by player: #{winners.count 'Player'}"
   prompt "Rounds won by computer: #{winners.count 'Computer'}"
   puts ''
@@ -304,12 +332,13 @@ end
 
 loop do
   winners = []
-  rounds = 0
+  rounds = { current_round: 0, last_round: 0 }
 
   system 'clear'
   prompt "Welcome to a game of Tic-Tac_Toe"
   puts ""
   brd_size = set_board_size
+  rounds[:last_round] = determine_rounds
   starting_player = choose_starting_player
 
   loop do
@@ -326,14 +355,31 @@ loop do
     end
 
     winners << detect_winner(brd)
-    rounds += 1
+    rounds[:current_round] += 1
 
-    if winners.count('Player') == 5 || winners.count('Computer') == 5
-      prompt "#{detect_winner(brd)} won 5 games! The game is over"
+    rounds_to_win = rounds[:last_round] / 2 + 1
+    computer_wins = winners.count('Computer')
+    player_wins = winners.count('Player')
+
+    puts ""
+    if computer_wins == rounds_to_win || player_wins == rounds_to_win
+      prompt "#{detect_winner(brd)} won #{rounds_to_win} games! Game over!"
+      break
+    end
+
+    if rounds[:current_round] == rounds[:last_round]
+      if computer_wins > player_wins
+        prompt "The Computer has won with #{computer_wins}:#{player_wins}"
+      elsif computer_wins < player_wins
+        prompt "The Player has won with #{player_wins}:#{computer_wins}"
+      else
+        prompt "It is a tie, nobody won."
+      end
       break
     end
   end
 
+  puts ""
   prompt "If you want to play again type y!"
   answer = gets.chomp
   break unless answer.downcase.start_with?('y')
