@@ -186,3 +186,5 @@ What to change?
   column: map the rows -> first of every subary in an array then the seconds...
   column: think about how to do that programmaticcaly :) 
 - let player choose rounds as ending
+- add square numbers to empty squares
+- refactor programm into different files

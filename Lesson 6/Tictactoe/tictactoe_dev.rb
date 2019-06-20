@@ -6,21 +6,47 @@ require 'pry-byebug'
 INITIAL_MARKER = ' '
 PLAYER_MARKER = 'X'
 COMPUTER_MARKER = 'O'
-FIRST = 'player'
+STARTING_PLAYER = 'player'
 BOARD_SIZE = 'choose'
 EMPTY_SQUARES_FOR_AI = 10
-WIDTH_3X3 = 3
-
-WINNING_LINES_3x3 = [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # columns
-                    [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
-                    [[1, 5, 9], [3, 5, 7]]              # diagonals
-
-WINNING_LINES_5x5 = [[1, 6, 11, 16, 21], [2, 7, 12, 17, 22], [3, 8, 13, 18, 23], [4, 9, 14, 19, 24], [5, 10, 15, 20, 25]] + # columns
-                    [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10], [11, 12, 13, 14, 15], [16, 17, 18, 19, 20], [21, 22, 23, 24, 25]] + # rows
-                    [[1, 7, 13, 19, 25], [5, 9, 13, 17, 21]]              # diagonals
 
 def prompt(msg)
   puts "=> #{msg}"
+end
+
+def calculate_rows(brd)
+  brd_width = calculate_width(brd)
+  rows = brd.keys
+  winning_rows = []
+
+  brd_width.times { winning_rows << rows.shift(brd_width) }
+  winning_rows
+end
+
+def calculate_columns(brd)
+  brd_width = calculate_width(brd)
+  columns = Array.new(calculate_width(brd), [])
+
+  columns.map.with_index do |_sub_ary, idx|
+    (idx + 1).step(by: brd_width, to: brd.size).to_a
+  end
+end
+
+def calculate_diagonals(brd)
+  width = calculate_width(brd)
+  size = brd.size
+  diagonals = []
+
+  diagonals << 1.step(by: width + 1, to: size).to_a
+  diagonals << width.step(by: width - 1, to: size - width + 1).to_a
+end
+
+def calculate_winning_lines(brd)
+  rows = calculate_rows(brd)
+  columns = calculate_columns(brd)
+  diagonals = calculate_diagonals(brd)
+
+  rows + columns + diagonals
 end
 
 def display_empty_space(brd_width)
@@ -124,10 +150,9 @@ def middle_point(brd)
 end
 
 def simple_square_picker(brd)
-  winning_lines = choose_winning_lines(brd)
   square = nil
   [COMPUTER_MARKER, PLAYER_MARKER].each do |marker|
-    winning_lines.each do |line|
+    WINNING_LINES.each do |line|
       square = find_at_risk_square(line, brd, marker)
       break if square
     end
@@ -218,8 +243,7 @@ end
 def detect_winner(brd)
   lines_to_win = calculate_width(brd)
 
-  winning_lines = choose_winning_lines(brd)
-  winning_lines.each do |line|
+  WINNING_LINES.each do |line|
     if brd.values_at(*line).count(PLAYER_MARKER) == lines_to_win
       return 'Player'
     elsif brd.values_at(*line).count(COMPUTER_MARKER) == lines_to_win
@@ -243,8 +267,8 @@ def joinor(ary, delimiter=', ', word='or')
   end
 end
 
-def choose_first_player
-  if FIRST == 'choose'
+def choose_starting_player
+  if STARTING_PLAYER == 'choose'
     loop do
       prompt 'Who shall go first? Type player or computer?'
       answer = gets.chomp
@@ -253,7 +277,7 @@ def choose_first_player
       prompt 'Not a valid choice!'
     end
   else
-    FIRST
+    STARTING_PLAYER
   end
 end
 
@@ -278,26 +302,20 @@ def display_game_stats(rounds, winners)
   puts ''
 end
 
-def choose_winning_lines(brd)
-  if calculate_width(brd) == WIDTH_3X3
-    WINNING_LINES_3x3
-  else
-    WINNING_LINES_5x5
-  end
-end
-
 loop do
   winners = []
   rounds = 0
 
   system 'clear'
   prompt "Welcome to a game of Tic-Tac_Toe"
+  puts ""
   brd_size = set_board_size
-  starting_player = choose_first_player
+  starting_player = choose_starting_player
 
   loop do
     brd = initialize_board(brd_size)
     current_player = starting_player
+    WINNING_LINES = calculate_winning_lines(brd)
 
     loop do
       display_board(brd)
