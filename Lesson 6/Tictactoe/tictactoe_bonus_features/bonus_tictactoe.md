@@ -189,4 +189,4 @@ What to change?
 - add square numbers to empty squares DONE
 
 - refactor code 
-- write read me
+- write read me DONE
