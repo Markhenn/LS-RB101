@@ -121,8 +121,8 @@ def set_board_size
       prompt "Type 5 for 5x5"
       prompt "Type 6 for 6x6"
       prompt "Type 7 for 7x7"
-      answer = gets.chomp.to_i
-      break answer**2 if (3..7).cover?(answer)
+      answer = gets.chomp
+      break answer.to_i**2 if (3..7).map(&:to_s).include?(answer)
       prompt 'Not a valid choice, please type a number from 3 to 7!'
     end
   else
@@ -143,8 +143,8 @@ def determine_rounds
       prompt "How many rounds would you like to play?"
       prompt "Choose between 1 and 99 rounds"
       prompt "Type 1 for 1 round, 2 for 2 rounds..."
-      answer = gets.chomp.to_i
-      break answer if (1..99).cover?(answer)
+      answer = gets.chomp
+      break answer.to_i if (1..99).map(&:to_s).include?(answer)
 
       prompt "Not a valid choice, type a number between 1 and 99!"
     end
@@ -174,8 +174,9 @@ def player_places_piece!(brd)
   square = ''
   loop do
     prompt "Choose a square (#{joinor(empty_squares?(brd))}):"
-    square = gets.chomp.to_i
-    break if empty_squares?(brd).include?(square)
+    answer = gets.chomp
+    square = answer.to_i
+    break  if empty_squares?(brd).map(&:to_s).include?(answer)
 
     prompt "Not a valid choice!"
   end
@@ -324,7 +325,52 @@ def detect_winner(brd)
   nil
 end
 
+def game_is_won(winners, rounds)
+  rounds_to_win = rounds[:last_round] / 2 + 1
+  computer_wins = winners.count('Computer')
+  player_wins = winners.count('Player')
+
+  if computer_wins == rounds_to_win || player_wins == rounds_to_win
+    display_winner(computer_wins, player_wins, rounds)
+    true
+  end
+end
+
+def last_round_played(winners, rounds)
+  computer_wins = winners.count('Computer')
+  player_wins = winners.count('Player')
+
+  if rounds[:current_round] == rounds[:last_round]
+    display_winner(computer_wins, player_wins, rounds)
+    true
+  end
+end
+
+def display_winner(computer_wins, player_wins, rounds)
+  puts ""
+  if computer_wins > player_wins
+    prompt "The Computer has won with #{computer_wins}:#{player_wins} " \
+    "out of #{rounds[:current_round]} rounds"
+  elsif computer_wins < player_wins
+    prompt "The Player has won with #{player_wins}:#{computer_wins} " \
+    "out of #{rounds[:current_round]} rounds"
+  else
+    prompt "It is a tie with #{player_wins}:#{computer_wins}, nobody won " \
+    "after #{rounds[:current_round]} rounds."
+  end
+end
+
 # Section: Play a round
+
+def players_move(brd, rounds, winners, current_player)
+  loop do
+    display_board(brd)
+    display_game_stats(rounds, winners)
+    place_piece!(brd, current_player)
+    current_player = alternate_player(current_player)
+    break if someone_won?(brd) || board_full?(brd)
+  end
+end
 
 def place_piece!(brd, player)
   if player == 'p'
@@ -368,38 +414,13 @@ loop do
     current_player = starting_player
     WINNING_LINES = calculate_winning_lines(brd)
 
-    loop do
-      display_board(brd)
-      display_game_stats(rounds, winners)
-      place_piece!(brd, current_player)
-      current_player = alternate_player(current_player)
-      break if someone_won?(brd) || board_full?(brd)
-    end
+    players_move(brd, rounds, winners, current_player)
 
     winners << detect_winner(brd)
     rounds[:current_round] += 1
 
-    rounds_to_win = rounds[:last_round] / 2 + 1
-    computer_wins = winners.count('Computer')
-    player_wins = winners.count('Player')
-
-    puts ""
-    if computer_wins == rounds_to_win || player_wins == rounds_to_win
-      prompt "#{detect_winner(brd)} already won #{rounds_to_win} " \
-      "out of #{rounds[:last_round]} rounds! Game over!"
-      break
-    end
-
-    if rounds[:current_round] == rounds[:last_round]
-      if computer_wins > player_wins
-        prompt "The Computer has won with #{computer_wins}:#{player_wins}"
-      elsif computer_wins < player_wins
-        prompt "The Player has won with #{player_wins}:#{computer_wins}"
-      else
-        prompt "It is a tie, nobody won."
-      end
-      break
-    end
+    break if game_is_won(winners, rounds)
+    break if last_round_played(winners, rounds)
   end
 
   puts ""
