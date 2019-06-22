@@ -325,39 +325,43 @@ def detect_winner(brd)
   nil
 end
 
-def game_is_won(winners, rounds)
+def game_is_won?(winners, rounds)
   rounds_to_win = rounds[:last_round] / 2 + 1
   computer_wins = winners.count('Computer')
   player_wins = winners.count('Player')
 
   if computer_wins == rounds_to_win || player_wins == rounds_to_win
-    display_winner(computer_wins, player_wins, rounds)
+    winner = determine_game_winner(computer_wins, player_wins)
+    display_game_result(computer_wins, player_wins, rounds, winner)
     true
   end
 end
 
-def last_round_played(winners, rounds)
+def last_round_played?(winners, rounds)
   computer_wins = winners.count('Computer')
   player_wins = winners.count('Player')
 
   if rounds[:current_round] == rounds[:last_round]
-    display_winner(computer_wins, player_wins, rounds)
+    winner = determine_game_winner(computer_wins, player_wins)
+    display_game_result(computer_wins, player_wins, rounds, winner)
     true
   end
 end
 
-def display_winner(computer_wins, player_wins, rounds)
-  puts ""
+def determine_game_winner(computer_wins, player_wins)
   if computer_wins > player_wins
-    prompt "The Computer has won with #{computer_wins}:#{player_wins} " \
-    "out of #{rounds[:current_round]} rounds"
+    'the computer'
   elsif computer_wins < player_wins
-    prompt "The Player has won with #{player_wins}:#{computer_wins} " \
-    "out of #{rounds[:current_round]} rounds"
+    'The player'
   else
-    prompt "It is a tie with #{player_wins}:#{computer_wins}, nobody won " \
-    "after #{rounds[:current_round]} rounds."
+    'No one'
   end
+end
+
+def display_game_result(computer_wins, player_wins, rounds, winner)
+  puts ""
+  prompt "#{winner} has won after #{rounds[:current_round]} rounds. " \
+    "The player won #{player_wins} and the computer won #{computer_wins} rounds"
 end
 
 # Section: Play a round
@@ -419,8 +423,8 @@ loop do
     winners << detect_winner(brd)
     rounds[:current_round] += 1
 
-    break if game_is_won(winners, rounds)
-    break if last_round_played(winners, rounds)
+    break if game_is_won?(winners, rounds)
+    break if last_round_played?(winners, rounds)
   end
 
   puts ""
