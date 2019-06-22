@@ -326,31 +326,23 @@ def detect_winner(brd)
 end
 
 def game_is_won?(winners, rounds)
+  computer_wins = winners.count('Computer')
+  player_wins = winners.count('Player')
   rounds_to_win = rounds[:last_round] / 2 + 1
+
+  computer_wins == rounds_to_win || player_wins == rounds_to_win
+end
+
+def last_round_played?(rounds)
+  rounds[:current_round] == rounds[:last_round]
+end
+
+def determine_game_winner(winners)
   computer_wins = winners.count('Computer')
   player_wins = winners.count('Player')
 
-  if computer_wins == rounds_to_win || player_wins == rounds_to_win
-    winner = determine_game_winner(computer_wins, player_wins)
-    display_game_result(computer_wins, player_wins, rounds, winner)
-    true
-  end
-end
-
-def last_round_played?(winners, rounds)
-  computer_wins = winners.count('Computer')
-  player_wins = winners.count('Player')
-
-  if rounds[:current_round] == rounds[:last_round]
-    winner = determine_game_winner(computer_wins, player_wins)
-    display_game_result(computer_wins, player_wins, rounds, winner)
-    true
-  end
-end
-
-def determine_game_winner(computer_wins, player_wins)
   if computer_wins > player_wins
-    'the computer'
+    'The computer'
   elsif computer_wins < player_wins
     'The player'
   else
@@ -358,7 +350,10 @@ def determine_game_winner(computer_wins, player_wins)
   end
 end
 
-def display_game_result(computer_wins, player_wins, rounds, winner)
+def display_game_result(winners, rounds, winner)
+  computer_wins = winners.count('Computer')
+  player_wins = winners.count('Player')
+
   puts ""
   prompt "#{winner} has won after #{rounds[:current_round]} rounds. " \
     "The player won #{player_wins} and the computer won #{computer_wins} rounds"
@@ -424,8 +419,11 @@ loop do
     rounds[:current_round] += 1
 
     break if game_is_won?(winners, rounds)
-    break if last_round_played?(winners, rounds)
+    break if last_round_played?(rounds)
   end
+
+  winner = determine_game_winner(winners)
+  display_game_result(winners, rounds, winner)
 
   puts ""
   prompt "If you want to play again type y!"
