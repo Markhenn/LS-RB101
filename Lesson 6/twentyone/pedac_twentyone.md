@@ -48,6 +48,33 @@ def initialize_deck
       deck append [suit, value]
   return array
 
+# Deal Cards
+Each player receives two cards from the deck
+Player can see his cards
+Player can see one card from the dealer
+
+1 Method to deal a card to player or dealer
+1 method to display cards of player and one from dealer
+
+## Problem: Deal cards
+The two cards must be taken from the from the deck -> this means removed from the nested array
+input: deck (nested array with up to 52 arrays)
+output: 1 card (array)
+
+## Data Structure / Algorithm
+Shift the array and return the element
+
+
+## Problem: Display cards
+Display the cards that have been drawn so far for the player and the dealer
+input: nested array with cards for player and dealer
+output: display of cards
+
+# Data Structure / Algorithm
+PUTS player cards
+PUTS dealer card
+
+
 # Calculate Aces
 Calculating Aces. Remember that aces can be worth either 1 or 11, depending on the context. You should not ask the user what the value of the ace is; your program should be able to figure this out automatically.
 
@@ -60,9 +87,9 @@ Input: hand
 Output: total value
 
 ## Testcases:
-[['H', '5'], ['H', 'A']] == 16
-[['H', '5'], ['H', 'A'], ['H', 'J']] == 16
-[['H', '5'], ['H', 'A'], ['D', 'A']] == 17
+p total_value([['H', '5'], ['H', 'A']]) == 16
+p total_value([['H', '5'], ['H', 'A'], ['H', 'J']]) == 16
+p total_value([['H', '5'], ['H', 'A'], ['D', 'A']]) == 17
 
 ## Data Structure / Algorithm
 def total_value(cards)
@@ -77,3 +104,31 @@ def total_value(cards)
   total_value + 10 when total_value <= 11
   total_value
 end
+
+# Player Turn
+## Problem: Loop for hit or stay
+When thinking about how to code up the player's turn, think about a loop that keeps asking the player to either "hit" or "stay". Now, think about the breaking condition for that loop. 
+
+Player sees his cards and can hit or stay
+when stay -> break loop
+when hit -> draw another card -> loop again
+break also when player is busted
+
+Launch School code
+```ruby
+answer = nil
+loop do
+  puts "hit or stay?"
+  answer = gets.chomp
+  break if answer == 'stay' || busted?   # the busted? method is not shown
+end
+
+if busted?
+  # probably end the game? or ask the user to play again?
+else
+  puts "You chose to stay!"  # if player didn't bust, must have stayed to get here
+end
+
+# ... continue on to Dealer turn
+```
+
