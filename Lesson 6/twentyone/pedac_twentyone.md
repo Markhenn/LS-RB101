@@ -1,12 +1,12 @@
 PEDAC for twentyone game
 
 # High level pseudocode
-1. Initialize deck
-2. Deal cards to player and dealer
-3. Player turn: hit or stay
+1. Initialize deck -> done
+2. Deal cards to player and dealer -> done
+3. Player turn: hit or stay -> done
   - repeat until bust or "stay"
-4. If player bust, dealer wins.
-5. Dealer turn: hit or stay
+4. If player bust, dealer wins. -> 
+5. Dealer turn: hit or stay -> done
   - repeat until total >= 17
 6. If dealer bust, player wins.
 7. Compare cards and declare winner.
@@ -70,12 +70,12 @@ Display the cards that have been drawn so far for the player and the dealer
 input: nested array with cards for player and dealer
 output: display of cards
 
-# Data Structure / Algorithm
+## Data Structure / Algorithm
 PUTS player cards
 PUTS dealer card
 
 
-# Calculate Aces
+# Calculate Aces - Redo calculation of aces
 Calculating Aces. Remember that aces can be worth either 1 or 11, depending on the context. You should not ask the user what the value of the ace is; your program should be able to figure this out automatically.
 
 ## Problem: How to calculate the aces value
@@ -131,4 +131,25 @@ end
 
 # ... continue on to Dealer turn
 ```
+My solution:
+Player turn should mutate the cards array
+Input: array with the cards (nested array)
+Output: nil
+
+The loop to ask about hit or stay continues until
+  player says stay
+  player is bust -> own method to be defined
+
+## Data structure / algorithm
+def player_turn!(cards)
+  loop
+  display game stats
+  if bust -> break
+  input hit or stay
+  if stay -> break
+  draw another card
+  end
+end
+
+
 

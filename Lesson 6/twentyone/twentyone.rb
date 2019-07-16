@@ -52,13 +52,18 @@ def deal_card!(deck)
   deck.shift
 end
 
-def display_cards(player, dealer)
-  prompt "Your cards are:"
-  player.each do |card| 
-    prompt "#{SUITS[card[0]]} #{VALUES[card[1]]}"
+def display_cards(cards)
+  cards.each do |card|
+    prompt "#{VALUES[card[1]]} #{SUITS[card[0]]}"
   end
+end
 
-  prompt "The dealer has: #{SUITS[dealer[0][0]]} #{VALUES[dealer[0][1]]}"
+def display_game_stats(player, dealer)
+  prompt "Your cards are:"
+  display_cards(player)
+
+  prompt "The dealer has:"
+  display_cards(dealer)
 end
 
 def total_value(cards)
@@ -74,57 +79,48 @@ def total_value(cards)
           end
   end
 
-  total_value += 10 unless total_value > 11
+  total_value += 10 if total_value <= 11 && cards.flatten.include?('A')
   total_value
 end
 
 def busted?(cards)
-  p cards
-  prompt 'busted test'
-  true
+  total_value(cards) > 21
 end
 
-def player_turn!(cards)
-  answer = nil
-
+def player_turn!(cards, deck)
+  prompt "Player turn starts!"
   loop do
-    puts "hit or stay?"
+    display_cards(cards)
+    break if busted?(cards)
+
+    prompt "Type 'stay' to stay, type something else to hit."
     answer = gets.chomp
-    break if answer == 'stay' || busted?(cards)
-    # draw a card -> mutate cards
-  end
+    if answer == 'stay'
+      prompt "You choose to stay!"
+      break
+    end
 
-  if busted?(cards)
-    # probably end the game? or ask the user to play again?
-  else
-    puts "You chose to stay!"
+    cards << deal_card!(deck)
   end
-  # should return the result of the hand or nil
-  2
 end
 
-def dealer_turn!(cards)
+def dealer_turn!(cards, deck)
   loop do
-    #binding.pry
+    display_cards(cards)
     break if total_value(cards) >= 17 || busted?(cards)
-    # draw a card -> mutate cards
-  end
 
-  if busted?(cards)
-    prompt 'the dealer got busted!'
-    # Ask to play another game
-  else
-    puts "The dealer chose to stay!"
+    cards << deal_card!(deck)
   end
-  # should return the result of the hand or nil
-  1
 end
 
-def determine_winner(player_result, dealer_result)
-  if player_result > dealer_result
+def determine_winner(player_cards, dealer_cards)
+  p_result = total_value(player_cards)
+  d_result = total_value(dealer_cards)
+
+  if busted?(player_cards) || !busted?(dealer_cards) && p_result < d_result
+    'dealer'
+  elsif busted?(dealer_cards) || p_result > d_result
     'player'
-  elsif
-    'dealer wins'
   else
     'no_one'
   end
@@ -134,22 +130,34 @@ def display_winner(winner)
   prompt "The winner of this round of twentyone is: #{winner}"
 end
 
+prompt "Welcome to the twentyone game"
 basic_deck = initialize_deck
-deck = shuffle(basic_deck)
-
-p deck
-
 player_cards = []
 dealer_cards = []
-player_cards << deal_card!(deck) << deal_card!(deck)
-dealer_cards << deal_card!(deck) << deal_card!(deck)
 
-display_cards(player_cards, dealer_cards)
+loop do
+  deck = shuffle(basic_deck)
 
-player_result = player_turn!(player_cards)
-dealer_result = dealer_turn!(dealer_cards)
+  player_cards << deal_card!(deck) << deal_card!(deck)
+  dealer_cards << deal_card!(deck) << deal_card!(deck)
 
-winner = determine_winner(player_result, dealer_result)
+  first_dealer_card = [dealer_cards.first]
+
+  display_game_stats(player_cards, first_dealer_card)
+
+  player_turn!(player_cards, deck)
+  prompt "The total value of the player cards #{total_value(player_cards)}"
+  break prompt "player was busted!" if busted?(player_cards)
+
+  dealer_turn!(dealer_cards, deck)
+  prompt "The total value of the dealer cards #{total_value(dealer_cards)}"
+  break prompt "dealer was busted!" if busted?(dealer_cards)
+
+  puts
+
+  display_game_stats(player_cards, dealer_cards)
+  break
+end
+
+winner = determine_winner(player_cards, dealer_cards)
 display_winner(winner)
-
-# ... continue on to Dealer turn
