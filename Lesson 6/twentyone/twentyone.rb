@@ -31,13 +31,10 @@ def prompt(msg)
 end
 
 def initialize_deck
-  suits = ['H', 'D', 'C', 'S']
-  values = (2..10).map(&:to_s) + ['J', 'Q', 'K', 'A']
-  suits.each_with_object([]) do |suit, deck|
-    values.each do |value|
-      deck << [suit, value]
-    end
-  end
+  suits = SUITS.keys
+  values = VALUES.keys
+
+  suits.product(values)
 end
 
 def shuffle(deck)
@@ -56,14 +53,19 @@ def display_cards(cards)
   cards.each do |card|
     prompt "#{VALUES[card[1]]} #{SUITS[card[0]]}"
   end
+  puts
 end
 
 def display_game_stats(player, dealer)
+  system 'clear'
   prompt "Your cards are:"
   display_cards(player)
-
+  prompt "The total value of the player cards #{total_value(player)}"
+  puts
   prompt "The dealer has:"
   display_cards(dealer)
+  prompt "The total value of the dealer cards #{total_value(dealer)}"
+  puts
 end
 
 def total_value(cards)
@@ -71,7 +73,7 @@ def total_value(cards)
 
   total_value = values.reduce(0) do |sum, value|
     sum + if value == 'A'
-            1
+            11
           elsif value.to_i == 0
             10
           else
@@ -79,7 +81,7 @@ def total_value(cards)
           end
   end
 
-  total_value += 10 if total_value <= 11 && cards.flatten.include?('A')
+  total_value -= 10 if total_value > 21 && cards.flatten.include?('A')
   total_value
 end
 
@@ -87,10 +89,16 @@ def busted?(cards)
   total_value(cards) > 21
 end
 
+def display_busted(player, dealer)
+  prompt 'Player was busted' if total_value(player) > 21
+  prompt 'Dealer was busted' if total_value(dealer) > 21
+end
+
 def player_turn!(cards, deck)
   prompt "Player turn starts!"
   loop do
     display_cards(cards)
+    prompt "Total value: #{total_value(cards)}"
     break if busted?(cards)
 
     prompt "Type 'stay' to stay, type something else to hit."
@@ -127,6 +135,7 @@ def determine_winner(player_cards, dealer_cards)
 end
 
 def display_winner(winner)
+  puts
   prompt "The winner of this round of twentyone is: #{winner}"
 end
 
@@ -146,18 +155,14 @@ loop do
   display_game_stats(player_cards, first_dealer_card)
 
   player_turn!(player_cards, deck)
-  prompt "The total value of the player cards #{total_value(player_cards)}"
-  break prompt "player was busted!" if busted?(player_cards)
+  break if busted?(player_cards)
 
   dealer_turn!(dealer_cards, deck)
-  prompt "The total value of the dealer cards #{total_value(dealer_cards)}"
-  break prompt "dealer was busted!" if busted?(dealer_cards)
 
-  puts
-
-  display_game_stats(player_cards, dealer_cards)
   break
 end
 
+display_game_stats(player_cards, dealer_cards)
+display_busted(player_cards, dealer_cards)
 winner = determine_winner(player_cards, dealer_cards)
 display_winner(winner)
