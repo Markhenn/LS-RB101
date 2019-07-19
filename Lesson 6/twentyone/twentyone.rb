@@ -45,10 +45,6 @@ def shuffle(deck)
   deck.sample(deck.size)
 end
 
-def integer?(value)
-  value.to_i.to_s == value
-end
-
 def deal_card!(deck)
   deck.shift
 end
@@ -77,7 +73,9 @@ def total_value(cards)
           end
   end
 
-  total_value -= 10 if total_value > PLAY_TO && cards.flatten.include?('A')
+  cards.each do |card|
+    total_value -= 10 if card[1] == 'A' && total_value > PLAY_TO
+  end
   total_value
 end
 
@@ -94,9 +92,9 @@ def player_turn!(cards, deck, value)
     puts
     break if busted?(value)
 
-    prompt "Type 'stay' to stay, type something else to hit."
+    prompt "Type 's' to stay, type something else to hit."
     answer = gets.chomp
-    break prompt "You choose to stay!" if answer == 'stay'
+    break prompt "You choose to stay!" if answer.downcase.start_with?('s')
 
     cards << deal_card!(deck)
     value = total_value(cards)
@@ -117,7 +115,7 @@ def dealer_turn!(cards, deck, value)
   end
 end
 
-def display_round_result(player_cards, dealer_cards, player_value, dealer_value)
+def display_round_stats(player_cards, dealer_cards, player_value, dealer_value)
   puts
   puts "---"
   prompt "The game is over!"
@@ -131,7 +129,7 @@ def display_round_result(player_cards, dealer_cards, player_value, dealer_value)
   puts
 end
 
-def determine_result(player_value, dealer_value)
+def determine_round_result(player_value, dealer_value)
   if player_value > PLAY_TO
     :busted_player
   elsif dealer_value > PLAY_TO
@@ -145,7 +143,7 @@ def determine_result(player_value, dealer_value)
   end
 end
 
-def display_winner(result)
+def display_round_winner(result)
   case result
   when :busted_player then prompt "The player was busted, the dealer wins!"
   when :busted_dealer then prompt "The dealer was busted, the player wins!"
@@ -224,12 +222,12 @@ loop do
       dealer_value = total_value(dealer_cards)
     end
 
-    display_round_result(player_cards, dealer_cards, player_value, dealer_value)
+    display_round_stats(player_cards, dealer_cards, player_value, dealer_value)
 
-    result = determine_result(player_value, dealer_value)
+    result = determine_round_result(player_value, dealer_value)
+    display_round_winner(result)
+
     update_game_score!(result, round_results)
-    display_winner(result)
-
     display_game_stats(round_results)
 
     break if someone_won?(round_results)
