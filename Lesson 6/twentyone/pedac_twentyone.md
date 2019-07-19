@@ -76,7 +76,7 @@ PUTS dealer card
 
 
 # Calculate Aces - Redo calculation of aces
-Calculating Aces. Remember that aces can be worth either 1 or 11, depending on the context. You should not ask the user what the value of the ace is; your program should be able to figure this out automatically.
+Calculating Aces. Remember that aces can be worth either 1 or 11, depending on the context. You should not ask the user what the value of the ace is your program should be able to figure this out automatically.
 
 ## Problem: How to calculate the aces value
 there could be more than 1 ace
