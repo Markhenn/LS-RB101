@@ -60,10 +60,8 @@ def display_card_values(value, name)
   prompt "The total value of the #{name} cards #{value}"
 end
 
-def total_value(cards)
-  values = cards.map { |card| card[1] }
-
-  total_value = values.reduce(0) do |sum, value|
+def value_of_cards(values)
+  values.reduce(0) do |sum, value|
     sum + if value == 'A'
             11
           elsif value.to_i == 0
@@ -72,15 +70,34 @@ def total_value(cards)
             value.to_i
           end
   end
+end
 
-  cards.each do |card|
-    total_value -= 10 if card[1] == 'A' && total_value > PLAY_TO
+def correct_for_aces(card_values)
+  value = value_of_cards(card_values)
+
+  card_values.reduce(value) do |total_value, card_value|
+    if card_value == 'A' && total_value > PLAY_TO
+      total_value - 10
+    else
+      total_value
+    end
   end
-  total_value
+end
+
+def total_value(cards)
+  card_values = cards.map { |card| card[1] }
+
+  correct_for_aces(card_values)
 end
 
 def busted?(value)
   value > PLAY_TO
+end
+
+def player_stays?
+  prompt "Type 's' to stay, type something else to hit."
+  answer = gets.chomp
+  true if answer.downcase.start_with?('s')
 end
 
 def player_turn!(cards, deck, value)
@@ -92,12 +109,11 @@ def player_turn!(cards, deck, value)
     puts
     break if busted?(value)
 
-    prompt "Type 's' to stay, type something else to hit."
-    answer = gets.chomp
-    break prompt "You choose to stay!" if answer.downcase.start_with?('s')
+    break prompt "You choose to stay!" if player_stays?
 
     cards << deal_card!(deck)
     value = total_value(cards)
+    system('clear') || system('cls')
   end
 end
 
@@ -116,8 +132,6 @@ def dealer_turn!(cards, deck, value)
 end
 
 def display_round_stats(player_cards, dealer_cards, player_value, dealer_value)
-  puts
-  puts "---"
   prompt "The game is over!"
   puts
   display_cards(player_cards, "player's")
@@ -153,8 +167,12 @@ def display_round_winner(result)
   end
 end
 
+def calculate_rounds(results)
+  results.values.reduce(&:+)
+end
+
 def display_game_stats(results)
-  rounds_played = results.values.reduce(&:+)
+  rounds_played = calculate_rounds(results)
   puts
   puts '---'
   prompt "#{rounds_played} rounds have been played."
@@ -188,11 +206,13 @@ end
 
 def game_end?
   puts
-  prompt "If you want to play another round type 'yes'."
+  prompt "If you want to play another round type 'y', game ends otherwise."
   answer = gets.chomp
   return false if answer.downcase.start_with?('y')
   true
 end
+
+system('clear') || system('cls')
 
 prompt "Welcome to the twentyone game"
 puts
@@ -222,6 +242,8 @@ loop do
       dealer_value = total_value(dealer_cards)
     end
 
+    system('clear') || system('cls')
+
     display_round_stats(player_cards, dealer_cards, player_value, dealer_value)
 
     result = determine_round_result(player_value, dealer_value)
@@ -236,6 +258,7 @@ loop do
   display_game_winner(round_results)
 
   break if game_end?
+  system('clear') || system('cls')
 end
 
 prompt "Thank you for playing twentyone!"
