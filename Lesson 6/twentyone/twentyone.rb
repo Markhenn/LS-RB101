@@ -172,10 +172,9 @@ def calculate_rounds(results)
 end
 
 def display_game_stats(results)
-  rounds_played = calculate_rounds(results)
   puts
   puts '---'
-  prompt "#{rounds_played} rounds have been played."
+  prompt "#{calculate_rounds(results)} rounds have been played."
   prompt "The player won #{results[:player_wins]} times."
   prompt "The dealer won #{results[:dealer_wins]} times."
   puts '---'
