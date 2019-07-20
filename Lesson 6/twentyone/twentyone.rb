@@ -72,9 +72,7 @@ def value_of_cards(values)
   end
 end
 
-def correct_for_aces(card_values)
-  value = value_of_cards(card_values)
-
+def correct_value_for_aces(card_values, value)
   card_values.reduce(value) do |total_value, card_value|
     if card_value == 'A' && total_value > PLAY_TO
       total_value - 10
@@ -87,7 +85,8 @@ end
 def total_value(cards)
   card_values = cards.map { |card| card[1] }
 
-  correct_for_aces(card_values)
+  value = value_of_cards(card_values)
+  correct_value_for_aces(card_values, value)
 end
 
 def busted?(value)
