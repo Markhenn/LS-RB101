@@ -1,8 +1,5 @@
 # The twentyone game from Launch School assignment
 
-require 'pry'
-require 'pry-byebug'
-
 PLAY_TO = 21
 STAY_AT = 17
 WINS = 5
