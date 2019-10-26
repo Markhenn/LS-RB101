@@ -17,8 +17,8 @@
 =end
 
 def reverse_words string
-  reverse_size_5 = Proc.new {|element| element.size >= 5 ? element.reverse : element }
-  string.split.map(&reverse_size_5).join(" ")
+  reverse_size5 = Proc.new {|element| element.size >= 5 ? element.reverse : element }
+  string.split.map(&reverse_size5).join(" ")
 end
 
 puts reverse_words('Professional')          # => lanoisseforP
